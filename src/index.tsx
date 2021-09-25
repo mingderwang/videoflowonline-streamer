@@ -1,10 +1,16 @@
 import * as React from 'react'
-import styles from './styles.module.css'
+import ReactPlayer from 'react-player'
 
-interface Props {
-  text: string
-}
-
-export const ExampleComponent = ({ text }: Props) => {
-  return <div className={styles.test}>Example Component: {text}</div>
+export const VideoPlayerComponent = () => {
+  return(
+  <div className='player-wrapper'>
+    <ReactPlayer
+      url='https://vimeo.com/243556536'
+      className='react-player'
+      playing
+      width='100%'
+      height='100%'
+    />
+  </div>
+  )
 }
