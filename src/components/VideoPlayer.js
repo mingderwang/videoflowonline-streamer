@@ -7,7 +7,7 @@ const VideoPlayer = ({ onCapture }) => {
   var videoRef = createRef()
   var canvasRef = createRef()
   const [container, setContainer] = useState({ width: 640, height: 480 })
-  const [isCanvasEmpty, setIsCanvasEmpty] = useState(true)
+  const [online, setOnline] = useState(true)
   useEffect(() => {
     var capture_options = {
       video: { facingMode: 'environment' },
@@ -31,10 +31,10 @@ const VideoPlayer = ({ onCapture }) => {
   }, [])
   const offsets = { x: 0, y: 0 }
 
-  const golive = () => {
+  const offline = () => {
     console.log('recorder cant not be stopped, data available')
   }
-  const capture = () => {
+  const setOneline = () => {
     function toBuffer(ab) {
       var buf = Buffer.alloc(ab.byteLength)
       var view = new Uint8Array(ab)
@@ -58,7 +58,7 @@ const VideoPlayer = ({ onCapture }) => {
     )
 
     canvasRef.current.toBlob((blob) => onCapture(blob), 'image/jpeg', 1)
-    setIsCanvasEmpty(false)
+    setOnline(false)
 
     // recording
     let mediaStream = document.querySelector('video').captureStream(30) // 30 FPS
@@ -92,10 +92,9 @@ const VideoPlayer = ({ onCapture }) => {
         width={container.width}
         height={container.height}
       />
-      <button onClick={capture}>
-        {isCanvasEmpty ? 'Take a picture' : 'Take another picture'}
+      <button onClick={online ? setOneline : offline}>
+        {online ? 'On line' : 'Off line'}
       </button>
-      <button onClick={golive}>stop streaming</button>
     </div>
   )
 }
