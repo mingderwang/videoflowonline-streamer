@@ -1,7 +1,7 @@
 {
-  "name": "video2nft",
-  "version": "1.0.0",
-  "description": "Pay Per Stream via NFT Payment Ecosystem. ",
+  "name": "videoflowonline-streamer",
+  "version": "0.0.1",
+  "description": "Video FLow Online Streamer",
   "author": "MS-hack",
   "license": "MIT",
   "repository": "MS-hack/video2nft",
