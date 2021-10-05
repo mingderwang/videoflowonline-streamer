@@ -1,16 +1,21 @@
 import * as React from 'react'
-import ReactPlayer from 'react-player'
-
+import VideoPlayer from './components/VideoPlayer'
+import { useState } from 'react'
 export const VideoPlayerComponent = () => {
-  return(
-  <div className='player-wrapper'>
-    <ReactPlayer
-      url='https://vimeo.com/243556536'
-      className='react-player'
-      playing
-      width='100%'
-      height='100%'
-    />
-  </div>
+  const [cardImage, setCardImage] = useState()
+  return (
+    <div className='player-wrapper'>
+      <VideoPlayer
+        onCapture={(blob: any) => {
+          setCardImage(blob)
+        }}
+      />
+      {cardImage && (
+        <div>
+          <h2>Preview</h2>
+          <img src={cardImage && URL.createObjectURL(cardImage)} />
+        </div>
+      )}
+    </div>
   )
 }

@@ -61,6 +61,7 @@
     "dist"
   ],
   "dependencies": {
-    "react-player": "^2.9.0"
+    "safe-buffer": "^5.2.1",
+    "websocket-stream": "^5.5.2"
   }
 }
