@@ -28,10 +28,14 @@ const VideoPlayer = ({ onCapture }) => {
     if (address !== '') {
       const sk = await helper.checkAndCreateSteamKey(address)
       console.log('streamKey set to:', sk.streamKey)
-      if (sk.streamKey !== '🚀') {
-        console.log('🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀', sk.streamKey)
-        wsCommand.write(sk.streamKey)
-        setStreamKey[sk.streamKey]
+      if (sk.streamKey !== '') {
+        console.log('🚀🚀🚀🚀🚀🚀🚀', sk.streamKey)
+        setStreamKey[sk.streamKey] // useless
+        try {
+          wsCommand.write(sk.streamKey)
+        } catch (e) {
+          alert('please start ffmpeg proxy server first.')
+        }
       }
     }
   }, [address])
@@ -39,6 +43,11 @@ const VideoPlayer = ({ onCapture }) => {
   useEffect(() => {
     wsCommand = websocket('ws://' + serverUrl + '/streamKey', {
       binary: false
+    })
+    wsCommand.on('data',function (o) {
+      console.log('on data', o)
+      const str = String.fromCharCode.apply(null, o);
+      setStreamKey(str)
     })
     var constraints = {
       video: { facingMode: 'environment' },
@@ -62,10 +71,6 @@ const VideoPlayer = ({ onCapture }) => {
       })
       console.log('mediaStream', mediaStream)
       console.log('mediaRecorder', mediaRecorder)
-      if (streamKey !== '🚀') {
-        console.log('🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀', streamKey)
-        wsCommand.write(streamKey)
-      }
       if ('ropsten' === x.name) {
         Contract_ro.getNetFlow().then((x) => {
           console.log('🧔🏻‍♀️ ', x)
@@ -96,6 +101,11 @@ const VideoPlayer = ({ onCapture }) => {
   }
 
   const golive = () => {
+    if (streamKey === '🚀') {
+      alert('no streamKey')
+      return
+    }
+    wsCommand.write(streamKey)
     function toBuffer(ab) {
       var buf = Buffer.alloc(ab.byteLength)
       var view = new Uint8Array(ab)
@@ -137,6 +147,7 @@ const VideoPlayer = ({ onCapture }) => {
       <ConnectComponent text='📡' />
       <Fragment>
         <div>
+          livepeer stream key: {streamKey}
           <p style={onAir ? onAirStyle : offAirStyle}>
             {onAir ? 'ON AIR' : 'OFFLINE'}
           </p>
