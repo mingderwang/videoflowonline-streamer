@@ -6,7 +6,7 @@ const Buffer = require('safe-buffer').Buffer
 var ws, wsCommand
 var mediaStream
 var mediaRecorder
-const serverUrl = 'localhost:3000' // or 51.15.52.186:3000 for mars.muzamint.com (fix steamKey)
+const serverUrl = 'localhost:4000' // or 51.15.52.186:4000 for mars.muzamint.com (fix steamKey)
 //var myStreamID = '0d19-wi38-udkl-jwam'
 var myAddress = '0xf3e06eeC1A90A7aEB10F768B924351A0F0158A1A'
 
@@ -16,7 +16,7 @@ import {
   Contract_ro
 } from '@nftaftermarket/superxerox2'
 
-const VideoPlayer = ({ onCapture, streamID }) => {
+const VideoPlayer = ({ onCapture }) => {
   var videoRef = createRef()
   const [container, setContainer] = useState({ width: 640, height: 480 })
   const [onAir, setOnAir] = useState(false)
@@ -25,15 +25,21 @@ const VideoPlayer = ({ onCapture, streamID }) => {
 
   helper.useEffectAsync(async () => {
     console.log('address', address)
-    if ( address !== '') {
-    const sk = await helper.checkAndCreateSteamKey(address)
-    const j = await sk.json()
-    console.log('streamKey', j)
-    setStreamKey[j.streamKey]
+    if (address !== '') {
+      const sk = await helper.checkAndCreateSteamKey(address)
+      console.log('streamKey set to:', sk.streamKey)
+      setStreamKey[sk.streamKey]
+      if (sk.streamKey !== '🚀') {
+        console.log('🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀', sk.streamKey)
+        wsCommand.write(sk.streamKey)
+      }
     }
   }, [address])
 
   useEffect(() => {
+    wsCommand = websocket('ws://' + serverUrl + '/streamKey', {
+        binary: false
+      })
     var capture_options = {
       video: { facingMode: 'environment' },
       audio: true
@@ -42,10 +48,24 @@ const VideoPlayer = ({ onCapture, streamID }) => {
     async function run() {
       const x = await CurrentProvider.getNetwork()
       const signer = await CurrentProvider.getSigner()
-      const address = await signer.getAddress()
+      const y = await signer.getAddress()
       console.log('💋current network: ', await signer.getAddress())
-      setAddress(address)
+      setAddress(y)
+      getMedia(capture_options)
+      ws = websocket('ws://' + serverUrl, { binary: true })
       
+      // start streaming
+      mediaStream = document.querySelector('video').captureStream(30) // 30 FPS
+      mediaRecorder = new MediaRecorder(mediaStream, {
+        mimeType: 'video/webm;codecs=h264',
+        videoBitsPerSecond: 3 * 640 * 480
+      })
+      console.log('mediaStream', mediaStream)
+      console.log('mediaRecorder', mediaRecorder)
+      if (streamKey !== '🚀') {
+        console.log('🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀', streamKey)
+        wsCommand.write(streamKey)
+      }
       if ('ropsten' === x.name) {
         Contract_ro.getNetFlow().then((x) => {
           console.log('🧔🏻‍♀️ ', x)
@@ -66,19 +86,6 @@ const VideoPlayer = ({ onCapture, streamID }) => {
       }
     }
     run()
-
-    getMedia(capture_options)
-    ws = websocket('ws://' + serverUrl, { binary: true })
-    wsCommand = websocket('ws://' + serverUrl + '/streamKey', { binary: false })
-    // start streaming
-    mediaStream = document.querySelector('video').captureStream(30) // 30 FPS
-    mediaRecorder = new MediaRecorder(mediaStream, {
-      mimeType: 'video/webm;codecs=h264',
-      videoBitsPerSecond: 3 * 640 * 480
-    })
-    console.log('mediaStream', mediaStream)
-    console.log('mediaRecorder', mediaRecorder)
-    wsCommand.write(streamID)
   }, [])
 
   const goOff = () => {
@@ -129,7 +136,7 @@ const VideoPlayer = ({ onCapture, streamID }) => {
       <Fragment>
         <div>
           <p style={onAir ? onAirStyle : offAirStyle}>
-            {onAir ? 'ON AIR' : 'OFFLINE'}
+            {onAir ? 'ON AIR' + streamKey : 'OFFLINE'}
           </p>
           <button onClick={onAir ? goOff : golive}>
             {onAir ? 'Stop Streaming' : 'Start Streaming'}

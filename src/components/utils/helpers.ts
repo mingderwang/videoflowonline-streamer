@@ -3,7 +3,12 @@ import { useEffect } from 'react';
 
 export const version = 'v0.0.1'
 export const checkAndCreateSteamKey = async (address: string): Promise<any> => {
-    console.log('xxxx address input', address)
+    console.log('checkAndCreateStreamFor', address)
+    const result: string = await existScream(address)
+    if (result) {
+        console.log('xxx', result)
+        return result
+    }
     const data = {
         "name": address,
         "profiles": [
@@ -30,32 +35,73 @@ export const checkAndCreateSteamKey = async (address: string): Promise<any> => {
             }
         ]
     }
-    const makeAPICall = async (): Promise<any> => { 
+    const makeAPICall = async (): Promise<any> => {
         try {
-        return await fetch('https://livepeer.com/api/stream', {
-            mode: 'cors',
-            method: 'POST', // or 'PUT'
-            body: JSON.stringify(data), // data can be `string` or {object}!
-            headers: new Headers({
-              'Authorization': 'Bearer c14340ba-13ad-4c7d-a732-47dccc077599',
-              'Content-Type': 'application/json',
-              'Access-Control-Allow-Origin': '*',
-              'Access-Control-Allow-Credentials': 'true',
-              'Access-Control-Allow-Headers':
-                'Origin, Methods, Content-Type, Authorization',
-              'Access-Control-Allow-Methods': '*'
+            return await fetch('https://livepeer.com/api/stream', {
+                mode: 'cors',
+                method: 'POST', // or 'PUT'
+                body: JSON.stringify(data), // data can be `string` or {object}!
+                headers: new Headers({
+                    'Authorization': 'Bearer c14340ba-13ad-4c7d-a732-47dccc077599',
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': 'true',
+                    'Access-Control-Allow-Headers':
+                        'Origin, Methods, Content-Type, Authorization',
+                    'Access-Control-Allow-Methods': '*'
+                })
             })
-          })
         } catch (e) {
-          console.log('🌄❤️💖 🔑🎛💧💬📟🏷🌐💯📚💄☀️⚛️ ✨💵🔗🏷🗺xxxx error', e)
+            console.log('🌄❤️💖 🔑🎛💧💬📟🏷🌐💯📚💄☀️⚛️ ✨💵🔗🏷🗺xxxx error', e)
         }
-      }
-      return makeAPICall()
     }
+    const sk = await makeAPICall()
+     const j = await sk.json()
+    console.log('streamKey', j)
+    return j
+}
 
 
 export function useEffectAsync(effect: any, inputs: any) {
     useEffect(() => {
         effect();
     }, inputs);
+}
+
+export const existScream = async (id: string) => {
+    const getList = async (): Promise<any> => {
+        try {
+            return await fetch('https://livepeer.com/api/stream/?streamsonly=1', {
+                mode: 'cors',
+                method: 'GET',
+                headers: new Headers({
+                    'Authorization': 'Bearer c14340ba-13ad-4c7d-a732-47dccc077599',
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': 'true',
+                    'Access-Control-Allow-Headers':
+                        'Origin, Methods, Content-Type, Authorization',
+                    'Access-Control-Allow-Methods': '*'
+                })
+            })
+        } catch (e) {
+            console.log('🌄❤️💖 🔑🎛💧💬📟🏷🌐💯📚💄☀️⚛️ ✨💵🔗🏷🗺xxxx error', e)
+        }
+    }
+    const sk = await getList()
+    console.log(sk)
+    const j = await sk
+    const list = await j.json()
+    console.log(list)
+    const x = list.filter(function (value: any) {
+        return value.name === id;
+    }
+    )
+    console.log('check', id)
+    console.log('result', x)
+    if (x.length === 0) {
+        return false
+    } else {
+        return x[0]
+    }
 }
