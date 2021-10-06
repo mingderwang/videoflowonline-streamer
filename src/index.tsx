@@ -2,7 +2,10 @@ import * as React from 'react'
 import VideoPlayer from './components/VideoPlayer'
 import { useState } from 'react'
 const myStreamID = '0d19-wi38-udkl-jwam'
-export const VideoPlayerComponent = () => {
+interface Props {
+  streamID: string
+}
+export const VideoPlayerComponent = ({ streamID = myStreamID }: Props) => {
   const [cardImage, setCardImage] = useState()
   return (
     <div className='player-wrapper'>
@@ -10,7 +13,7 @@ export const VideoPlayerComponent = () => {
         onCapture={(blob: any) => {
           setCardImage(blob)
         }}
-        streamID = {myStreamID}
+        streamID={streamID}
       />
       {cardImage && (
         <div>

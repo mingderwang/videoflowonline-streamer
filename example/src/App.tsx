@@ -1,10 +1,12 @@
 import React from 'react'
-
 import { VideoPlayerComponent } from 'video2nft'
-import 'video2nft/dist/index.css'
 
 const App = () => {
-  return <VideoPlayerComponent />
+  return (
+    <>
+      <VideoPlayerComponent streamID={''} />
+    </>
+  )
 }
 
 export default App
