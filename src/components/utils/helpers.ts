@@ -4,7 +4,6 @@ import { useEffect } from 'react';
 export const version = 'v0.0.1'
 export const checkAndCreateSteamKey = async (address: string): Promise<any> => {
     console.log('xxxx address input', address)
-    /*
     const data = {
         "name": address,
         "profiles": [
@@ -31,25 +30,28 @@ export const checkAndCreateSteamKey = async (address: string): Promise<any> => {
             }
         ]
     }
-    
-    const instance = axios.create({
-        baseURL: 'https://livepeer.com/api/stream',
-        timeout: 10000,
-        headers: {'Access-Control-Allow-Credentials': true, 'Access-Control-Allow-Headers': 'Origin, Methods, Content-Type, Authorization','Access-Control-Allow-Methods': '*', 'Access-Control-Allow-Origin': 'http://localhost:3001', 'Content-Type': 'application/json', 'authorization': 'Bearer c14340ba-13ad-4c7d-a732-47dccc077599' }
-    });
-
-    console.log(instance)
-
-    instance.post('/', data)
-        .then(function (response: any) {
-            console.log(response);
-        })
-        .catch(function (error: any) {
-            console.log(error);
-        });
-        */
-        
-}
+    const makeAPICall = async (): Promise<any> => { 
+        try {
+        return await fetch('https://livepeer.com/api/stream', {
+            mode: 'cors',
+            method: 'POST', // or 'PUT'
+            body: JSON.stringify(data), // data can be `string` or {object}!
+            headers: new Headers({
+              'Authorization': 'Bearer c14340ba-13ad-4c7d-a732-47dccc077599',
+              'Content-Type': 'application/json',
+              'Access-Control-Allow-Origin': '*',
+              'Access-Control-Allow-Credentials': 'true',
+              'Access-Control-Allow-Headers':
+                'Origin, Methods, Content-Type, Authorization',
+              'Access-Control-Allow-Methods': '*'
+            })
+          })
+        } catch (e) {
+          console.log('🌄❤️💖 🔑🎛💧💬📟🏷🌐💯📚💄☀️⚛️ ✨💵🔗🏷🗺xxxx error', e)
+        }
+      }
+      return makeAPICall()
+    }
 
 
 export function useEffectAsync(effect: any, inputs: any) {
