@@ -28,19 +28,19 @@ const VideoPlayer = ({ onCapture }) => {
     if (address !== '') {
       const sk = await helper.checkAndCreateSteamKey(address)
       console.log('streamKey set to:', sk.streamKey)
-      setStreamKey[sk.streamKey]
       if (sk.streamKey !== '🚀') {
         console.log('🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀', sk.streamKey)
         wsCommand.write(sk.streamKey)
+        setStreamKey[sk.streamKey]
       }
     }
   }, [address])
 
   useEffect(() => {
     wsCommand = websocket('ws://' + serverUrl + '/streamKey', {
-        binary: false
-      })
-    var capture_options = {
+      binary: false
+    })
+    var constraints = {
       video: { facingMode: 'environment' },
       audio: true
     }
@@ -51,9 +51,9 @@ const VideoPlayer = ({ onCapture }) => {
       const y = await signer.getAddress()
       console.log('💋current network: ', await signer.getAddress())
       setAddress(y)
-      getMedia(capture_options)
+      getMedia(constraints)
       ws = websocket('ws://' + serverUrl, { binary: true })
-      
+
       // start streaming
       mediaStream = document.querySelector('video').captureStream(30) // 30 FPS
       mediaRecorder = new MediaRecorder(mediaStream, {
@@ -74,16 +74,18 @@ const VideoPlayer = ({ onCapture }) => {
     }
 
     async function getMedia(options) {
-      let streamx = null
-      try {
-        streamx = await navigator.mediaDevices.getUserMedia(options)
-        if (streamx && videoRef.current && !videoRef.current.srcObject) {
-          videoRef.current.srcObject = streamx
-        }
-      } catch (err) {
-        /* handle the error */
-        console.log(err)
-      }
+      const streamx = navigator.mediaDevices
+        .getUserMedia(options)
+        .then(function (mediaStream) {
+          var video = document.querySelector('video')
+          video.srcObject = mediaStream
+          video.onloadedmetadata = function (e) {
+            video.play()
+          }
+        })
+        .catch(function (err) {
+          console.log(err.name + ': ' + err.message)
+        })
     }
     run()
   }, [])
@@ -136,7 +138,7 @@ const VideoPlayer = ({ onCapture }) => {
       <Fragment>
         <div>
           <p style={onAir ? onAirStyle : offAirStyle}>
-            {onAir ? 'ON AIR' + streamKey : 'OFFLINE'}
+            {onAir ? 'ON AIR' : 'OFFLINE'}
           </p>
           <button onClick={onAir ? goOff : golive}>
             {onAir ? 'Stop Streaming' : 'Start Streaming'}
