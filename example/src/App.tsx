@@ -1,5 +1,5 @@
 import React from 'react'
-import { VideoPlayerComponent } from 'video2nft'
+import { VideoPlayerComponent } from 'videoflowonline-streamer'
 
 const App = () => {
   return (

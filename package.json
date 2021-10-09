@@ -4,7 +4,7 @@
   "description": "Video FLow Online Streamer",
   "author": "MS-hack",
   "license": "MIT",
-  "repository": "MS-hack/video2nft",
+  "repository": "MS-hack/videoflowonline-streamer",
   "main": "dist/index.js",
   "module": "dist/index.modern.js",
   "source": "src/index.tsx",
