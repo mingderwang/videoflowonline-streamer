@@ -55,6 +55,21 @@ const VideoPlayer = ({ onCapture }) => {
   }, [address])
 
   useEffect(() => {
+    const timer = window.setInterval(() => {
+      checkFlow()
+    }, 1000)
+    return () => window.clearInterval(timer)
+  }, [])
+
+  const checkFlow = async () => {
+    if (typeof bob !== 'undefined') {
+      const details = await bob.details()
+      console.log('🌙', details.cfa.flows.netFlow)
+      setInflow(details.cfa.flows.netFlow)
+    }
+  }
+
+  useEffect(() => {
     wsCommand = websocket('ws://' + serverUrl + '/streamKey', {
       binary: false
     })
@@ -89,17 +104,8 @@ const VideoPlayer = ({ onCapture }) => {
 
         let sf = await startSuperFlow(provider)
         console.log('sf', sf.tokens.fDAIx)
-        
+
         bob = sf.user({ address: myAddress, token: sf.tokens.fDAIx.address })
-        const details = await bob.details()
-        const inflow = details.cfa.flows.inFlows
-        if (inflow.length > 0) {
-          setInflow(inflow[0].sender)
-          console.log(
-            '⚡🌙 🌄❤️💖 🔑🎛💧💬📟🏷🌐💯📚💄☀️⚛️ ✨💵🔗🏷🗺',
-            details
-          )
-        }
 
         ws = websocket('ws://' + serverUrl, { binary: true })
 
