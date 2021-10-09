@@ -6,7 +6,7 @@ export const checkAndCreateSteamKey = async (address: string): Promise<any> => {
     console.log('checkAndCreateStreamFor', address)
     const result: string = await existStream(address)
     if (result) {
-        console.log('xxx', result)
+        console.log('existStream result', result)
         return result
     }
     const data = {
@@ -56,7 +56,7 @@ export const checkAndCreateSteamKey = async (address: string): Promise<any> => {
         }
     }
     const sk = await makeAPICall()
-     const j = await sk.json()
+    const j = await sk.json()
     console.log('streamKey', j)
     return j
 }
@@ -89,10 +89,10 @@ export const existStream = async (id: string) => {
         }
     }
     const sk = await getList()
-    console.log(sk)
+    console.log('🤖💩💎🦎 ⚒⚒  sk', sk)
     const j = await sk
     const list = await j.json()
-    console.log(list)
+    console.log('list', list)
     const x = list.filter(function (value: any) {
         return value.name === id;
     }

@@ -1,5 +1,8 @@
 import React, { useEffect, createRef, useState, Fragment } from 'react'
 import * as helper from './utils'
+import SuperfluidSDK from '@superfluid-finance/js-sdk'
+const { Web3Provider } = require('@ethersproject/providers')
+var bob
 
 const websocket = require('websocket-stream')
 const Buffer = require('safe-buffer').Buffer
@@ -10,18 +13,24 @@ const serverUrl = 'localhost:4000' // or 51.15.52.186:4000 for mars.muzamint.com
 //var myStreamID = '0d19-wi38-udkl-jwam'
 var myAddress = '0xf3e06eeC1A90A7aEB10F768B924351A0F0158A1A'
 
-import {
-  CurrentProvider,
-  ConnectComponent,
-  Contract_ro
-} from '@nftaftermarket/superxerox2'
-
 const VideoPlayer = ({ onCapture }) => {
   var videoRef = createRef()
   const [container, setContainer] = useState({ width: 640, height: 480 })
   const [onAir, setOnAir] = useState(false)
   const [address, setAddress] = useState('')
   const [streamKey, setStreamKey] = useState('🚀')
+  const [inflow, setInflow] = useState('🚀')
+  const [netflow, setNetflow] = useState('🚀')
+
+  const startSuperFlow = async (provider) => {
+    const sf = new SuperfluidSDK.Framework({
+      ethers: provider,
+      version: 'v1', //"test"
+      tokens: ['fDAI']
+    })
+    await sf.initialize()
+    return sf
+  }
 
   helper.useEffectAsync(async () => {
     console.log('address', address)
@@ -44,9 +53,10 @@ const VideoPlayer = ({ onCapture }) => {
     wsCommand = websocket('ws://' + serverUrl + '/streamKey', {
       binary: false
     })
-    wsCommand.on('data',function (o) {
+    wsCommand.on('data', function (o) {
       console.log('on data', o)
-      const str = String.fromCharCode.apply(null, o);
+      const str = String.fromCharCode.apply(null, o)
+      console.log('skey', str)
       setStreamKey(str)
     })
     var constraints = {
@@ -55,12 +65,30 @@ const VideoPlayer = ({ onCapture }) => {
     }
 
     async function run() {
+      const CurrentProvider = new Web3Provider(window.ethereum)
       const x = await CurrentProvider.getNetwork()
+      console.log('💋 my network:', x)
       const signer = await CurrentProvider.getSigner()
-      const y = await signer.getAddress()
-      console.log('💋current network: ', await signer.getAddress())
-      setAddress(y)
+      console.log('💋 my signer:', signer)
+      const myAddress = await signer.getAddress()
+      console.log('💋 my address:', myAddress)
+      setAddress(myAddress)
       getMedia(constraints)
+      let sf = await startSuperFlow(CurrentProvider)
+      console.log('sf', sf.tokens.fDAIx)
+      bob = sf.user({ address: myAddress, token: sf.tokens.fDAIx.address })
+      const netflow = (await sf.cfa.getNetFlow({superToken: sf.tokens.fDAIx.address, account: bob})).toString()
+      setNetflow(netflow)
+      const details = await bob.details()
+      const inflow = details.cfa.flows.inFlows
+      if (inflow.length > 0) {
+        setInflow(inflow[0].sender)
+        console.log(
+          '⚡🌙 🌄❤️💖 🔑🎛💧💬📟🏷🌐💯📚💄☀️⚛️ ✨💵🔗🏷🗺',
+          details.cfa.flows
+        )
+      }
+
       ws = websocket('ws://' + serverUrl, { binary: true })
 
       // start streaming
@@ -71,11 +99,6 @@ const VideoPlayer = ({ onCapture }) => {
       })
       console.log('mediaStream', mediaStream)
       console.log('mediaRecorder', mediaRecorder)
-      if ('ropsten' === x.name) {
-        Contract_ro.getNetFlow().then((x) => {
-          console.log('🧔🏻‍♀️ ', x)
-        })
-      }
     }
 
     async function getMedia(options) {
@@ -144,7 +167,6 @@ const VideoPlayer = ({ onCapture }) => {
 
   return (
     <>
-      <ConnectComponent text='📡' />
       <Fragment>
         <div>
           livepeer stream key: {streamKey}
@@ -154,8 +176,16 @@ const VideoPlayer = ({ onCapture }) => {
           <button onClick={onAir ? goOff : golive}>
             {onAir ? 'Stop Streaming' : 'Start Streaming'}
           </button>
-          <video ref={videoRef} autoPlay width="320" height="240" controls></video>
+          <video
+            ref={videoRef}
+            autoPlay
+            width='320'
+            height='240'
+            controls
+          ></video>
           <p>{address}</p>
+          <p>$$$ flow in from: {inflow}</p>
+          <p>netflow total: {netflow}</p>
         </div>
       </Fragment>
     </>
