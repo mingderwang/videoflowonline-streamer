@@ -1,8 +1,12 @@
 import React, { useEffect, createRef, useState, Fragment } from 'react'
 import * as helper from './utils'
 import SuperfluidSDK from '@superfluid-finance/js-sdk'
+import Web3Modal from 'web3modal'
 const { Web3Provider } = require('@ethersproject/providers')
 var bob
+const providerOptions = {
+  /* See Provider Options Section */
+}
 
 const websocket = require('websocket-stream')
 const Buffer = require('safe-buffer').Buffer
@@ -21,6 +25,7 @@ const VideoPlayer = ({ onCapture }) => {
   const [streamKey, setStreamKey] = useState('🚀')
   const [inflow, setInflow] = useState('🚀')
   const [netflow, setNetflow] = useState('🚀')
+  const [network, setNetwork] = useState('')
 
   const startSuperFlow = async (provider) => {
     const sf = new SuperfluidSDK.Framework({
@@ -65,40 +70,48 @@ const VideoPlayer = ({ onCapture }) => {
     }
 
     async function run() {
-      const CurrentProvider = new Web3Provider(window.ethereum)
-      const x = await CurrentProvider.getNetwork()
-      console.log('💋 my network:', x)
-      const signer = await CurrentProvider.getSigner()
-      console.log('💋 my signer:', signer)
-      const myAddress = await signer.getAddress()
-      console.log('💋 my address:', myAddress)
-      setAddress(myAddress)
-      getMedia(constraints)
-      let sf = await startSuperFlow(CurrentProvider)
-      console.log('sf', sf.tokens.fDAIx)
-      bob = sf.user({ address: myAddress, token: sf.tokens.fDAIx.address })
-      const netflow = (await sf.cfa.getNetFlow({superToken: sf.tokens.fDAIx.address, account: bob})).toString()
-      setNetflow(netflow)
-      const details = await bob.details()
-      const inflow = details.cfa.flows.inFlows
-      if (inflow.length > 0) {
-        setInflow(inflow[0].sender)
-        console.log(
-          '⚡🌙 🌄❤️💖 🔑🎛💧💬📟🏷🌐💯📚💄☀️⚛️ ✨💵🔗🏷🗺',
-          details.cfa.flows
-        )
-      }
-
-      ws = websocket('ws://' + serverUrl, { binary: true })
-
-      // start streaming
-      mediaStream = document.querySelector('video').captureStream(30) // 30 FPS
-      mediaRecorder = new MediaRecorder(mediaStream, {
-        mimeType: 'video/webm;codecs=h264',
-        videoBitsPerSecond: 3 * 640 * 480
+      const web3Modal = new Web3Modal({
+        //network: 'ropsten', // optional
+        cacheProvider: true, // optional
+        providerOptions // required
       })
-      console.log('mediaStream', mediaStream)
-      console.log('mediaRecorder', mediaRecorder)
+      const provider = new Web3Provider(window.ethereum)
+
+      if (typeof provider !== 'undefined') {
+        const signer = await provider.getSigner()
+        const address = await signer.getAddress()
+        console.log('address:', address)
+        setAddress(address)
+        let network = await provider.getNetwork()
+        setNetwork(network)
+        console.log('provider:', provider)
+        getMedia(constraints)
+
+        let sf = await startSuperFlow(provider)
+        console.log('sf', sf.tokens.fDAIx)
+        
+        bob = sf.user({ address: myAddress, token: sf.tokens.fDAIx.address })
+        const details = await bob.details()
+        const inflow = details.cfa.flows.inFlows
+        if (inflow.length > 0) {
+          setInflow(inflow[0].sender)
+          console.log(
+            '⚡🌙 🌄❤️💖 🔑🎛💧💬📟🏷🌐💯📚💄☀️⚛️ ✨💵🔗🏷🗺',
+            details
+          )
+        }
+
+        ws = websocket('ws://' + serverUrl, { binary: true })
+
+        // start streaming
+        mediaStream = document.querySelector('video').captureStream(30) // 30 FPS
+        mediaRecorder = new MediaRecorder(mediaStream, {
+          mimeType: 'video/webm;codecs=h264',
+          videoBitsPerSecond: 3 * 640 * 480
+        })
+        console.log('mediaStream', mediaStream)
+        console.log('mediaRecorder', mediaRecorder)
+      }
     }
 
     async function getMedia(options) {
