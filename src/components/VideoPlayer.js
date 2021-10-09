@@ -154,7 +154,7 @@ const VideoPlayer = ({ onCapture }) => {
           <button onClick={onAir ? goOff : golive}>
             {onAir ? 'Stop Streaming' : 'Start Streaming'}
           </button>
-          <video ref={videoRef} autoPlay></video>
+          <video ref={videoRef} autoPlay width="320" height="240" controls></video>
           <p>{address}</p>
         </div>
       </Fragment>

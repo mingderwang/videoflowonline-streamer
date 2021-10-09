@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 export const version = 'v0.0.1'
 export const checkAndCreateSteamKey = async (address: string): Promise<any> => {
     console.log('checkAndCreateStreamFor', address)
-    const result: string = await existScream(address)
+    const result: string = await existStream(address)
     if (result) {
         console.log('xxx', result)
         return result
@@ -68,7 +68,7 @@ export function useEffectAsync(effect: any, inputs: any) {
     }, inputs);
 }
 
-export const existScream = async (id: string) => {
+export const existStream = async (id: string) => {
     const getList = async (): Promise<any> => {
         try {
             return await fetch('https://livepeer.com/api/stream/?streamsonly=1', {
