@@ -13,7 +13,7 @@ const Buffer = require('safe-buffer').Buffer
 var ws, wsCommand
 var mediaStream
 var mediaRecorder
-const serverUrl = 'localhost:4000' // 'localhost:4000' or 51.15.52.186:4000 for mars.muzamint.com (fix steamKey)
+const serverUrl = 'mars.muzamint.com:4000' // 'localhost:4000' or 51.15.52.186:4000 for mars.muzamint.com (fix steamKey)
 //var myStreamID = '0d19-wi38-udkl-jwam'
 //var myAddress = '0xf3e06eeC1A90A7aEB10F768B924351A0F0158A1A'
 var accumulated = BigNumber.from(0)
