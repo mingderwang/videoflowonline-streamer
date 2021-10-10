@@ -3,19 +3,20 @@ import * as helper from './utils'
 import SuperfluidSDK from '@superfluid-finance/js-sdk'
 import Web3Modal from 'web3modal'
 const { Web3Provider } = require('@ethersproject/providers')
+const { BigNumber } = require('@ethersproject/bignumber')
 var bob
 const providerOptions = {
   /* See Provider Options Section */
 }
-
 const websocket = require('websocket-stream')
 const Buffer = require('safe-buffer').Buffer
 var ws, wsCommand
 var mediaStream
 var mediaRecorder
-const serverUrl = 'mars.muzamint.com:4000' // 'localhost:4000' or 51.15.52.186:4000 for mars.muzamint.com (fix steamKey)
+const serverUrl = 'localhost:4000' // 'localhost:4000' or 51.15.52.186:4000 for mars.muzamint.com (fix steamKey)
 //var myStreamID = '0d19-wi38-udkl-jwam'
-var myAddress = '0xf3e06eeC1A90A7aEB10F768B924351A0F0158A1A'
+//var myAddress = '0xf3e06eeC1A90A7aEB10F768B924351A0F0158A1A'
+var accumulated = BigNumber.from(0)
 
 const VideoPlayer = ({ onCapture }) => {
   var videoRef = createRef()
@@ -23,7 +24,7 @@ const VideoPlayer = ({ onCapture }) => {
   const [onAir, setOnAir] = useState(false)
   const [address, setAddress] = useState('')
   const [streamKey, setStreamKey] = useState('🚀')
-  const [inflow, setInflow] = useState('🚀')
+  const [inflow, setInflow] = useState(0)
   const [netflow, setNetflow] = useState('🚀')
   const [network, setNetwork] = useState('')
 
@@ -64,8 +65,18 @@ const VideoPlayer = ({ onCapture }) => {
   const checkFlow = async () => {
     if (typeof bob !== 'undefined') {
       const details = await bob.details()
-      console.log('🌙', details.cfa.flows)
-      setInflow(details.cfa.flows.netFlow)
+      console.log('bob', bob)
+      if (details.cfa.netFlow !== '0') {
+        console.log('🌙', details.cfa.netFlow)
+        accumulated = accumulated.add(
+          BigNumber.from(details.cfa.netFlow).div(
+            BigNumber.from('277784691358')
+          )
+        )
+        console.log(accumulated)
+        console.log(Math.round((accumulated.toNumber() / 36) * 100) / 10000)
+        setInflow(Math.round((accumulated.toNumber() / 36) * 100) / 10000)
+      }
     }
   }
 
@@ -105,7 +116,7 @@ const VideoPlayer = ({ onCapture }) => {
         let sf = await startSuperFlow(provider2)
         console.log('sf', sf.tokens.fDAIx)
 
-        bob = sf.user({ address: myAddress, token: sf.tokens.fDAIx.address })
+        bob = sf.user({ address: address, token: sf.tokens.fDAIx.address })
 
         ws = websocket('ws://' + serverUrl, { binary: true })
 
@@ -203,8 +214,7 @@ const VideoPlayer = ({ onCapture }) => {
             controls
           ></video>
           <p>{address}</p>
-          <p>$$$ flow in from: {inflow}</p>
-          <p>netflow total: {netflow}</p>
+          <p><h2>fDAI tokens flow-in ${inflow} so far</h2></p>
         </div>
       </Fragment>
     </>
