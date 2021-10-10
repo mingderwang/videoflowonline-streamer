@@ -90,19 +90,19 @@ const VideoPlayer = ({ onCapture }) => {
         cacheProvider: true, // optional
         providerOptions // required
       })
-      const provider = new Web3Provider(window.ethereum)
-
+      //const provider = new Web3Provider(window.ethereum)
+      const provider = await web3Modal.connect()
       if (typeof provider !== 'undefined') {
-        const signer = await provider.getSigner()
-        const address = await signer.getAddress()
+        const address = await provider.selectedAddress
         console.log('address:', address)
         setAddress(address)
-        let network = await provider.getNetwork()
+        let network = await provider.chainId
         setNetwork(network)
         console.log('provider:', provider)
         getMedia(constraints)
+        const provider2 = new Web3Provider(provider)
 
-        let sf = await startSuperFlow(provider)
+        let sf = await startSuperFlow(provider2)
         console.log('sf', sf.tokens.fDAIx)
 
         bob = sf.user({ address: myAddress, token: sf.tokens.fDAIx.address })
