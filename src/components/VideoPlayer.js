@@ -64,7 +64,7 @@ const VideoPlayer = ({ onCapture }) => {
   const checkFlow = async () => {
     if (typeof bob !== 'undefined') {
       const details = await bob.details()
-      console.log('🌙', details.cfa.flows.netFlow)
+      console.log('🌙', details.cfa.flows)
       setInflow(details.cfa.flows.netFlow)
     }
   }

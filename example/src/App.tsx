@@ -4,7 +4,7 @@ import { VideoPlayerComponent } from 'videoflowonline-streamer'
 const App = () => {
   return (
     <>
-      <VideoPlayerComponent streamID='' />
+      <VideoPlayerComponent />
     </>
   )
 }
