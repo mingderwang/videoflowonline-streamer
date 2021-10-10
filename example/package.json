@@ -1,7 +1,7 @@
 {
   "name": "videoflowonline-viewer-example",
   "homepage": ".",
-  "version": "0.1.0",
+  "version": "0.1.4",
   "private": true,
   "scripts": {
     "start": "PORT=3000 node ../node_modules/react-scripts/bin/react-scripts.js start",
